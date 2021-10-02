@@ -22,7 +22,6 @@ def find_equation_value(equation:str)->float:
     '''solve a raw equation'''
     #start by changing cell references to the corresponding cell values
     clean_equation = re.sub(r'{[0-9]+}', _parse_cell_in_equation, equation)
-
     #evaluate a clean math equation (not containing cell references but only values)
     return evaluate_clean_equation(clean_equation)
 
@@ -102,7 +101,11 @@ def update_dependent_cells(cell_index):
     cells_to_re_eval = find_dependent_cells(cell_index=cell_index)
 
     #make sure to re evaluate the dependent cell based on a correct order:
-    cells_order = find_cells_order()
+    try:
+        cells_order = find_cells_order()
+    except nx.NetworkXUnfeasible:
+        print("Bad input cells received, dependency circulation found!")
+        raise ValueError()
     cells_to_re_eval_ordered = [x for x in cells_order if x in cells_to_re_eval]
 
 

@@ -1,4 +1,7 @@
 from typing import List
+
+from networkx import NetworkXUnfeasible
+
 from cell_state import state
 from utils.logic_utils import find_equation_dependencies, find_cells_order, evaluate_cell
 
@@ -16,7 +19,11 @@ def fill_cells_dependencies(cells: list) -> List[List[int]]:
 def compute_cell_values() -> None:
     '''Compute all cells values based on a legal order and save them inside the
     state cell_values dictionary'''
-    cells_order = find_cells_order()
+    try:
+        cells_order = find_cells_order()
+    except NetworkXUnfeasible:
+        print("Bad input cells received, dependency circulation found!")
+        raise ValueError()
     for cell_index in cells_order:
         state.cell_values[cell_index] = evaluate_cell(cell_index)
 
